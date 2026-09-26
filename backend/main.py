@@ -79,4 +79,6 @@ async def chat_endpoint(request: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000)
+    # Pass the app object so this works as `python backend/main.py`
+    # (string "backend.main:app" fails because the script is not a package).
+    uvicorn.run(app, host="127.0.0.1", port=8000)
