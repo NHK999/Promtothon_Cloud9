@@ -1,0 +1,2908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Janani — Offline Pregnancy AI Assistant</title>
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      /* Brand Color Palette (60-20-10-5-5 Rule) */
+      --cream: #FFF8F0;          /* 60% - Warm Cream Main Background */
+      --cream-card: #FFFFFF;
+      --deep-green: #07543D;     /* 20% - Headings, Navbar, Footer, Hero */
+      --deep-green-dark: #043627;
+      --leaf-green: #2F8F4E;     /* 10% - Nature/Health elements */
+      --lime-green: #78B943;     /* Highlights & active indicators */
+      --coral-pink: #F58F91;     /* 5% - Buttons & motherhood accents */
+      --coral-hover: #e87b7d;
+      --peach: #FFD0B5;          /* Soft backgrounds & warm borders */
+      --peach-light: #FFF4EC;
+      --cyan-blue: #159DDA;      /* 5% - Technology/Science/AI accents */
+      --charcoal: #17211D;       /* Body text */
+      --charcoal-muted: #53635B;
+      --charcoal-light: #81948B;
+
+      /* Emergency Palette */
+      --emergency-red: #D32F2F;
+      --emergency-red-dark: #9A0007;
+      --emergency-red-bg: #FFEBEE;
+      --emergency-red-border: #EF9A9A;
+      --emergency-amber: #F57C00;
+
+      --card-bg: #FFFFFF;
+      --card-border: #E8DFD5;
+      --card-shadow: 0 10px 30px rgba(7, 84, 61, 0.07), 0 2px 8px rgba(23, 33, 29, 0.04);
+      --card-shadow-hover: 0 16px 40px rgba(7, 84, 61, 0.12);
+
+      --danger: #d9383a;
+      --danger-bg: #FEECEE;
+      --danger-border: #F8B4B7;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--cream);
+      color: var(--charcoal);
+      overflow-x: hidden;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    /* BACKGROUND CANVAS FOR DYNAMIC PARTICLES */
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.55;
+    }
+
+    /* FLOATING BOTANICAL LEAF ACCENTS */
+    .floating-leaf {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.8;
+      filter: drop-shadow(0 8px 16px rgba(7, 84, 61, 0.15));
+      animation: leafFloat 8s infinite ease-in-out alternate;
+    }
+
+    .leaf-1 {
+      top: 12%;
+      left: 2%;
+      width: 65px;
+      transform: rotate(-25deg);
+      animation-duration: 9s;
+    }
+
+    .leaf-2 {
+      top: 25%;
+      right: 3%;
+      width: 75px;
+      transform: rotate(35deg);
+      animation-duration: 11s;
+      animation-delay: -3s;
+    }
+
+    @keyframes leafFloat {
+      0% { transform: translateY(0px) rotate(0deg) scale(1); }
+      50% { transform: translateY(-18px) rotate(6deg) scale(1.03); }
+      100% { transform: translateY(12px) rotate(-4deg) scale(0.98); }
+    }
+
+    /* NAVBAR */
+    nav.navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(7, 84, 61, 0.95);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 2px solid var(--lime-green);
+      z-index: 1000;
+      padding: 12px 24px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(7, 84, 61, 0.15);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #FFFFFF;
+    }
+
+    .nav-logo-frame {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--lime-green);
+      box-shadow: 0 0 12px rgba(120, 185, 67, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: transform 0.25s ease;
+    }
+
+    .nav-brand:hover .nav-logo-frame {
+      transform: scale(1.08) rotate(3deg);
+    }
+
+    .nav-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .nav-title-box h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #FFFFFF;
+    }
+
+    .nav-title-box h1 span {
+      color: var(--lime-green);
+    }
+
+    .nav-title-box p {
+      font-size: 0.76rem;
+      color: var(--peach);
+      font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 6px 0;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--lime-green);
+    }
+
+    .nav-btn {
+      background: linear-gradient(135deg, var(--coral-pink) 0%, #f07b7e 100%);
+      color: #FFFFFF !important;
+      padding: 9px 18px !important;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 14px rgba(245, 143, 145, 0.4);
+      transition: all 0.2s ease !important;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(245, 143, 145, 0.55);
+    }
+
+    /* MANUAL SOS BUTTON IN NAVBAR */
+    .nav-sos-btn {
+      background: linear-gradient(135deg, var(--emergency-red) 0%, var(--emergency-red-dark) 100%);
+      color: #FFFFFF !important;
+      padding: 9px 16px !important;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem !important;
+      font-weight: 700 !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 14px rgba(211, 47, 47, 0.5);
+      animation: pulseSos 2.5s infinite;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    @keyframes pulseSos {
+      0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(211, 47, 47, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+    }
+
+    /* CINEMATIC HERO SECTION */
+    section.hero-section {
+      position: relative;
+      min-height: 100vh;
+      padding-top: 100px;
+      padding-bottom: 60px;
+      display: flex;
+      align-items: center;
+      background: radial-gradient(circle at 60% 40%, rgba(255, 208, 181, 0.3) 0%, transparent 60%),
+                  radial-gradient(circle at 20% 80%, rgba(120, 185, 67, 0.12) 0%, transparent 50%),
+                  var(--cream);
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-text-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 15;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--leaf-green);
+      color: var(--deep-green);
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: fit-content;
+      box-shadow: 0 4px 12px rgba(7, 84, 61, 0.08);
+    }
+
+    .hero-pill .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--lime-green);
+      box-shadow: 0 0 0 0 rgba(120, 185, 67, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(120, 185, 67, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(120, 185, 67, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(120, 185, 67, 0); }
+    }
+
+    .hero-headline {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.3rem;
+      font-weight: 800;
+      line-height: 1.12;
+      color: var(--deep-green);
+      letter-spacing: -0.8px;
+    }
+
+    .hero-headline .gradient-text {
+      background: linear-gradient(135deg, var(--leaf-green) 0%, var(--deep-green) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+
+    .hero-headline .accent-coral {
+      color: var(--coral-pink);
+    }
+
+    .hero-subtitle {
+      font-size: 1.12rem;
+      color: var(--charcoal-muted);
+      max-width: 540px;
+      line-height: 1.65;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--coral-pink) 0%, #f07b7e 100%);
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 15px 30px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 1.05rem;
+      box-shadow: 0 6px 20px rgba(245, 143, 145, 0.45);
+      transition: all 0.25s ease;
+    }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 26px rgba(245, 143, 145, 0.55);
+    }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      color: var(--deep-green);
+      text-decoration: none;
+      padding: 14px 26px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 1rem;
+      border: 1.5px solid var(--leaf-green);
+      box-shadow: 0 4px 14px rgba(7, 84, 61, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .btn-hero-secondary:hover {
+      background: var(--peach-light);
+      border-color: var(--deep-green);
+      transform: translateY(-2px);
+    }
+
+    .hero-trust-metrics {
+      display: flex;
+      gap: 28px;
+      padding-top: 18px;
+      border-top: 1.5px solid rgba(232, 223, 213, 0.8);
+      margin-top: 10px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--deep-green);
+    }
+
+    .metric-lbl {
+      font-size: 0.8rem;
+      color: var(--charcoal-muted);
+      font-weight: 600;
+    }
+
+    /* HERO VISUAL PORTAL */
+    .hero-visual-col {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 12;
+    }
+
+    .portal-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .orbital-ring {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .ring-1 {
+      width: 110%;
+      height: 110%;
+      border: 1.5px dashed rgba(21, 157, 218, 0.4);
+      animation: spinClockwise 24s linear infinite;
+    }
+
+    .ring-2 {
+      width: 125%;
+      height: 125%;
+      border: 1px solid rgba(120, 185, 67, 0.35);
+      animation: spinCounter 32s linear infinite;
+    }
+
+    .ring-3 {
+      width: 90%;
+      height: 90%;
+      border: 1.5px dotted rgba(245, 143, 145, 0.45);
+      animation: spinClockwise 18s linear infinite;
+    }
+
+    @keyframes spinClockwise {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinCounter {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+
+    .video-portal-card {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid var(--deep-green);
+      box-shadow: 0 20px 50px rgba(7, 84, 61, 0.25), 0 0 40px rgba(120, 185, 67, 0.2);
+      position: relative;
+      background: #000000;
+    }
+
+    .hero-bg-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-floating-badge {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid var(--card-border);
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(7, 84, 61, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--deep-green);
+      animation: badgeFloat 6s ease-in-out infinite alternate;
+    }
+
+    .badge-top-right {
+      top: -5%;
+      right: -10%;
+      border-left: 4px solid var(--cyan-blue);
+      animation-delay: -2s;
+    }
+
+    .badge-bottom-left {
+      bottom: -4%;
+      left: -12%;
+      border-left: 4px solid var(--lime-green);
+      animation-delay: -4s;
+    }
+
+    @keyframes badgeFloat {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-12px); }
+    }
+
+    /* APP INTERACTIVE WORKSPACE (SETUP & CHAT) */
+    section.app-section {
+      padding: 80px 24px 100px;
+      position: relative;
+      z-index: 20;
+      background: linear-gradient(180deg, var(--cream) 0%, #FFFFFF 30%, var(--cream) 100%);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 40px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--leaf-green);
+      background: rgba(47, 143, 78, 0.1);
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: var(--deep-green);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      font-size: 1rem;
+      color: var(--charcoal-muted);
+    }
+
+    .app-wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .setup-hero {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .setup-hero-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: block;
+      border: 3px solid var(--deep-green);
+      box-shadow: 0 8px 24px rgba(7, 84, 61, 0.18);
+      background: transparent;
+      object-fit: cover;
+    }
+
+    .card h2 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--deep-green);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .card p.card-intro {
+      font-size: 0.94rem;
+      color: var(--charcoal-muted);
+    }
+
+    .form-group {
+      margin-top: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--deep-green);
+      margin-bottom: 6px;
+    }
+
+    input[type="number"],
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--card-border);
+      background: #FFFFFF;
+      color: var(--charcoal);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--leaf-green);
+      box-shadow: 0 0 0 3px rgba(47, 143, 78, 0.15);
+    }
+
+    .error-text {
+      color: var(--danger);
+      font-size: 0.84rem;
+      font-weight: 600;
+      margin-top: 6px;
+      min-height: 1.2em;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      margin-top: 22px;
+      background: linear-gradient(135deg, var(--coral-pink) 0%, #f07b7e 100%);
+      color: #FFFFFF;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      box-shadow: 0 6px 18px rgba(245, 143, 145, 0.45);
+      letter-spacing: 0.2px;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #f79ba0 0%, #e86b6e 100%);
+      box-shadow: 0 8px 22px rgba(245, 143, 145, 0.55);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      padding: 7px 14px;
+      background: var(--cream);
+      color: var(--deep-green);
+      border: 1.5px solid var(--card-border);
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+    }
+
+    .btn-secondary:hover {
+      background: var(--peach-light);
+      border-color: var(--leaf-green);
+      color: var(--leaf-green);
+    }
+
+    .privacy-note {
+      font-size: 0.84rem;
+      color: var(--charcoal-muted);
+      background: var(--peach-light);
+      border: 1px solid var(--peach);
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
+      margin-top: 18px;
+      line-height: 1.5;
+    }
+
+    /* CHAT SCREEN */
+    #chatScreen {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .meta-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chat-meta .pill {
+      background: #FFFFFF;
+      border: 1.5px solid var(--leaf-green);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      color: var(--deep-green);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(7, 84, 61, 0.05);
+    }
+
+    .chat-meta .pill-lang {
+      border-color: var(--cyan-blue);
+      color: #0b6992;
+    }
+
+    .chat-sos-btn {
+      background: var(--emergency-red);
+      color: #FFFFFF;
+      border: none;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 8px rgba(211, 47, 47, 0.35);
+      cursor: pointer;
+    }
+
+    .chat-sos-btn:hover {
+      background: var(--emergency-red-dark);
+      transform: scale(1.04);
+    }
+
+    .chat-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    #chatWindow {
+      background: #FFFFFF;
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      height: 460px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: inset 0 2px 8px rgba(7, 84, 61, 0.03);
+      scroll-behavior: smooth;
+    }
+
+    #chatWindow::-webkit-scrollbar {
+      width: 6px;
+    }
+    #chatWindow::-webkit-scrollbar-track {
+      background: var(--cream);
+      border-radius: 4px;
+    }
+    #chatWindow::-webkit-scrollbar-thumb {
+      background: var(--peach);
+      border-radius: 4px;
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      animation: msgPop 0.25s ease-out;
+    }
+
+    @keyframes msgPop {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--coral-pink) 0%, #f18285 100%);
+      color: #17211D;
+      font-weight: 500;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(245, 143, 145, 0.3);
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+      background: var(--cream);
+      border: 1px solid var(--card-border);
+      color: var(--charcoal);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(23, 33, 29, 0.04);
+      position: relative;
+    }
+
+    /* IN-CHAT EMERGENCY ESCALATION CARD */
+    .msg.bot.alert {
+      border: 2px solid var(--emergency-red);
+      background: var(--emergency-red-bg);
+      color: var(--emergency-red-dark);
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(211, 47, 47, 0.15);
+      max-width: 95%;
+    }
+
+    .in-chat-emergency-box {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .in-chat-emergency-btn {
+      background: var(--emergency-red);
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.92rem;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+    }
+
+    .in-chat-emergency-btn:hover {
+      background: var(--emergency-red-dark);
+    }
+
+    .msg.system {
+      align-self: center;
+      color: var(--charcoal-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: rgba(255, 208, 181, 0.35);
+      border: 1px solid var(--peach);
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+    }
+
+    .typing {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 18px;
+      background: var(--cream);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--leaf-green);
+      animation: blink 1.2s infinite ease-in-out;
+    }
+    .typing span:nth-child(2) {
+      animation-delay: 0.2s;
+      background: var(--lime-green);
+    }
+    .typing span:nth-child(3) {
+      animation-delay: 0.4s;
+      background: var(--coral-pink);
+    }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+      40% { opacity: 1; transform: scale(1.15); }
+    }
+
+    .quick-qs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-qs button {
+      background: #FFFFFF;
+      border: 1.5px solid var(--leaf-green);
+      color: var(--deep-green);
+      padding: 8px 15px;
+      border-radius: var(--radius-full);
+      font-size: 0.84rem;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(7, 84, 61, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    .quick-qs button:hover {
+      background: linear-gradient(135deg, var(--coral-pink) 0%, #f07b7e 100%);
+      border-color: var(--coral-pink);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(245, 143, 145, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-row input {
+      flex: 1;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--card-border);
+      padding: 14px 18px;
+      background: #FFFFFF;
+    }
+
+    .input-row input:focus {
+      border-color: var(--leaf-green);
+      box-shadow: 0 0 0 3px rgba(47, 143, 78, 0.15);
+    }
+
+    .input-row button {
+      padding: 0 28px;
+      background: linear-gradient(135deg, var(--coral-pink) 0%, #f07b7e 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-md);
+      font-size: 0.98rem;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(245, 143, 145, 0.4);
+    }
+
+    .input-row button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #f79ba0 0%, #e86b6e 100%);
+      transform: translateY(-2px);
+    }
+
+    .input-row button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* =========================================================
+       EMERGENCY MODE OVERLAY & FULL-SCREEN MODAL
+    ========================================================= */
+    #emergencyOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 20, 32, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: emergencyFadeIn 0.25s ease-out;
+    }
+
+    @keyframes emergencyFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .emergency-card {
+      background: #FFFFFF;
+      border: 3px solid var(--emergency-red);
+      border-radius: var(--radius-xl);
+      max-width: 620px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(211, 47, 47, 0.45);
+      position: relative;
+    }
+
+    .emergency-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .emergency-siren-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--emergency-red);
+      color: #FFFFFF;
+      padding: 6px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 14px rgba(211, 47, 47, 0.4);
+      margin-bottom: 12px;
+      animation: sirenFlash 1s infinite alternate;
+    }
+
+    @keyframes sirenFlash {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.04); opacity: 0.88; }
+    }
+
+    .emergency-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--emergency-red-dark);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .emergency-subtitle {
+      font-size: 0.95rem;
+      color: var(--charcoal);
+      font-weight: 600;
+      background: var(--emergency-red-bg);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--emergency-red-border);
+    }
+
+    .emergency-symptom-tag {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--emergency-red-dark);
+      font-weight: 700;
+    }
+
+    /* GEOLOCATION & FACILITY CARD */
+    .emergency-location-box {
+      background: var(--cream);
+      border: 1.5px solid var(--peach);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .location-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--deep-green);
+    }
+
+    .location-details {
+      font-size: 0.88rem;
+      color: var(--charcoal);
+      line-height: 1.4;
+    }
+
+    .nearest-facility-item {
+      background: #FFFFFF;
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .facility-info h5 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.98rem;
+      color: var(--deep-green);
+    }
+
+    .facility-info p {
+      font-size: 0.78rem;
+      color: var(--charcoal-muted);
+    }
+
+    /* PRIMARY EMERGENCY ACTION BUTTONS */
+    .emergency-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .btn-emergency-call {
+      padding: 18px 14px;
+      border-radius: var(--radius-lg);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #FFFFFF;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-call-ambulance {
+      background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
+      box-shadow: 0 8px 24px rgba(211, 47, 47, 0.45);
+    }
+
+    .btn-call-ambulance:hover {
+      background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(211, 47, 47, 0.6);
+    }
+
+    .btn-call-hospital {
+      background: linear-gradient(135deg, #07543D 0%, #043627 100%);
+      box-shadow: 0 8px 24px rgba(7, 84, 61, 0.4);
+    }
+
+    .btn-call-hospital:hover {
+      background: linear-gradient(135deg, #0A7353 0%, #07543D 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(7, 84, 61, 0.55);
+    }
+
+    .btn-emergency-sub {
+      font-size: 0.76rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    /* FALLBACK & LOCATION SHARING BUTTONS */
+    .emergency-secondary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn-emergency-secondary {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background: #FFFFFF;
+      border: 1.5px solid var(--card-border);
+      color: var(--deep-green);
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-emergency-secondary:hover {
+      background: var(--peach-light);
+      border-color: var(--leaf-green);
+      transform: translateY(-1px);
+    }
+
+    /* NON-RESPONSE UNRESPONSIVE ALERT BOX */
+    .unresponsive-alert-box {
+      background: #FFF3E0;
+      border: 1.5px solid var(--emergency-amber);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 0.84rem;
+      color: #E65100;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* FIRST AID IMMEDIATE GUIDANCE */
+    .emergency-guidance {
+      background: var(--cream);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 0.82rem;
+      color: var(--charcoal-muted);
+      margin-bottom: 18px;
+    }
+
+    .emergency-guidance h6 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      color: var(--deep-green);
+      margin-bottom: 6px;
+    }
+
+    .emergency-guidance ul {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .emergency-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+      padding-top: 16px;
+    }
+
+    .emergency-disclaimer {
+      font-size: 0.72rem;
+      color: var(--charcoal-muted);
+      max-width: 75%;
+    }
+
+    .btn-dismiss-emergency {
+      background: transparent;
+      border: 1px solid var(--charcoal-muted);
+      color: var(--charcoal);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-dismiss-emergency:hover {
+      background: #EEEEEE;
+    }
+
+    /* CALL CONFIRMATION MODAL */
+    #callConfirmDialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .confirm-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border: 2px solid var(--emergency-red);
+    }
+
+    .confirm-card h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      color: var(--emergency-red);
+      margin-bottom: 8px;
+    }
+
+    .confirm-card p {
+      font-size: 0.9rem;
+      color: var(--charcoal);
+      margin-bottom: 20px;
+    }
+
+    .confirm-btns {
+      display: flex;
+      gap: 12px;
+    }
+
+    .confirm-btns button {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+
+    .btn-confirm-yes {
+      background: var(--emergency-red);
+      color: #FFFFFF;
+    }
+
+    .btn-confirm-no {
+      background: var(--cream);
+      border: 1px solid var(--card-border);
+      color: var(--charcoal);
+    }
+
+    /* FEATURES GRID SECTION */
+    section.features-section {
+      padding: 90px 24px;
+      background: var(--cream);
+      position: relative;
+      z-index: 10;
+    }
+
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--leaf-green), var(--lime-green));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--leaf-green);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-md);
+      background: var(--peach-light);
+      border: 1.5px solid var(--peach);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--deep-green);
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 0.95rem;
+      color: var(--charcoal-muted);
+      line-height: 1.6;
+    }
+
+    /* TRIMESTER TIMELINE SECTION */
+    section.trimester-section {
+      padding: 90px 24px;
+      background: #FFFFFF;
+      position: relative;
+      z-index: 10;
+    }
+
+    .timeline-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .trimester-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+
+    .tri-tab-btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      background: var(--cream);
+      border: 1.5px solid var(--card-border);
+      color: var(--deep-green);
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .tri-tab-btn.active,
+    .tri-tab-btn:hover {
+      background: var(--deep-green);
+      color: #FFFFFF;
+      border-color: var(--deep-green);
+      box-shadow: 0 4px 14px rgba(7, 84, 61, 0.2);
+    }
+
+    .tri-tab-content {
+      display: none;
+      background: var(--cream);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      box-shadow: var(--card-shadow);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tri-tab-content.active {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tri-info h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      color: var(--deep-green);
+      margin-bottom: 12px;
+    }
+
+    .tri-info p {
+      color: var(--charcoal-muted);
+      font-size: 0.98rem;
+      margin-bottom: 18px;
+    }
+
+    .tri-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tri-points li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    .tri-points li span {
+      color: var(--leaf-green);
+    }
+
+    .tri-card-box {
+      background: #FFFFFF;
+      border: 1.5px solid var(--peach);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(7, 84, 61, 0.05);
+    }
+
+    .tri-card-box h5 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      color: var(--deep-green);
+      margin-bottom: 10px;
+    }
+
+    /* FAQ SECTION */
+    section.faq-section {
+      padding: 90px 24px;
+      background: var(--cream);
+      position: relative;
+      z-index: 10;
+    }
+
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item {
+      background: #FFFFFF;
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: all 0.25s ease;
+    }
+
+    .faq-item:hover {
+      border-color: var(--leaf-green);
+    }
+
+    .faq-question {
+      width: 100%;
+      text-align: left;
+      padding: 18px 22px;
+      background: transparent;
+      color: var(--deep-green);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-icon {
+      font-size: 1.2rem;
+      transition: transform 0.25s ease;
+      color: var(--leaf-green);
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+      color: var(--coral-pink);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 22px;
+      color: var(--charcoal-muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 200px;
+      padding: 0 22px 18px;
+    }
+
+    /* FOOTER */
+    footer {
+      width: 100%;
+      background: var(--deep-green);
+      border-top: 3px solid var(--lime-green);
+      color: var(--cream);
+      padding: 48px 24px 28px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 36px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .footer-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo-frame {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--lime-green);
+      overflow: hidden;
+    }
+
+    .footer-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .footer-brand h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      color: #FFFFFF;
+    }
+
+    .footer-brand p {
+      font-size: 0.88rem;
+      color: var(--peach);
+      line-height: 1.5;
+      max-width: 360px;
+    }
+
+    .footer-col h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      color: #FFFFFF;
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col a {
+      color: var(--peach);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-col a:hover {
+      color: var(--lime-green);
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 24px auto 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: rgba(255, 248, 240, 0.7);
+    }
+
+    .footer-bottom span {
+      color: var(--lime-green);
+      font-weight: 700;
+    }
+
+    /* SCROLL REVEAL ANIMATION */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 992px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 40px;
+      }
+      .hero-text-col {
+        align-items: center;
+      }
+      .hero-subtitle {
+        margin: 0 auto;
+      }
+      .hero-cta-group {
+        justify-content: center;
+      }
+      .hero-trust-metrics {
+        justify-content: center;
+      }
+      .tri-tab-content.active {
+        grid-template-columns: 1fr;
+      }
+      .footer-container {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-headline {
+        font-size: 2.3rem;
+      }
+      .section-title {
+        font-size: 1.8rem;
+      }
+      .card {
+        padding: 20px 16px;
+      }
+      #chatWindow {
+        height: 380px;
+      }
+      .hero-trust-metrics {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .emergency-actions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- FLOATING PARTICLES CANVAS -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- FLOATING BOTANICAL LEAF ACCENTS -->
+  <svg class="floating-leaf leaf-1" viewBox="0 0 64 64" fill="none">
+    <path d="M12 52C12 52 24 48 38 34C52 20 54 8 54 8C54 8 42 10 28 24C14 38 12 52 12 52Z" fill="#2F8F4E" fill-opacity="0.35"/>
+    <path d="M12 52C26 38 42 20 54 8" stroke="#07543D" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  <svg class="floating-leaf leaf-2" viewBox="0 0 64 64" fill="none">
+    <path d="M52 52C52 52 40 48 26 34C12 20 10 8 10 8C10 8 22 10 36 24C50 38 52 52 52 52Z" fill="#78B943" fill-opacity="0.3"/>
+    <path d="M52 52C38 38 22 20 10 8" stroke="#2F8F4E" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-brand">
+        <div class="nav-logo-frame">
+          <video src="assets/logo.mp4" autoplay loop muted playsinline class="nav-logo"></video>
+        </div>
+        <div class="nav-title-box">
+          <h1>Janani<span>.</span></h1>
+          <p>Offline Pregnancy AI Assistant</p>
+        </div>
+      </a>
+      
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button class="nav-sos-btn" onclick="triggerEmergencyMode('Manual SOS Trigger')">
+          <span>🚨 SOS Emergency</span>
+        </button>
+
+        <ul class="nav-links">
+          <li><a href="#appSection">Assistant</a></li>
+          <li><a href="#featuresSection">Features</a></li>
+          <li><a href="#trimesterSection">Trimesters</a></li>
+          <li><a href="#faqSection">FAQ</a></li>
+          <li><a href="#appSection" class="nav-btn">Launch AI</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-container">
+      
+      <!-- LEFT HERO TEXT -->
+      <div class="hero-text-col">
+        <div class="hero-pill">
+          <span class="pulse-dot"></span>
+          <span>100% Offline AI • Zero Cloud Tracking</span>
+        </div>
+
+        <h2 class="hero-headline">
+          Gentle, Private Care for <span class="gradient-text">Motherhood</span><span class="accent-coral">.</span>
+        </h2>
+
+        <p class="hero-subtitle">
+          Personalized week-by-week maternal guidance, clinical safety alerts, and fluent multilingual support in English, Telugu, and Hindi—powered locally on your device.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#appSection" class="btn-hero-primary">
+            <span>🌿 Open Janani Assistant</span>
+            <span>→</span>
+          </a>
+          <a href="#featuresSection" class="btn-hero-secondary">
+            <span>✨ Explore Features</span>
+          </a>
+        </div>
+
+        <div class="hero-trust-metrics">
+          <div class="metric-item">
+            <span class="metric-val">Weeks 1–40</span>
+            <span class="metric-lbl">Trimester Knowledge Base</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">0 Cloud Calls</span>
+            <span class="metric-lbl">Private & Encrypted Local AI</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">3 Languages</span>
+            <span class="metric-lbl">English • Telugu • Hindi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT HERO VIDEO PORTAL (RECREATING BG.mp4 DYNAMICS) -->
+      <div class="hero-visual-col">
+        <div class="portal-wrapper">
+          <div class="orbital-ring ring-1"></div>
+          <div class="orbital-ring ring-2"></div>
+          <div class="orbital-ring ring-3"></div>
+
+          <div class="video-portal-card">
+            <video src="assets/BG.mp4" autoplay loop muted playsinline class="hero-bg-video"></video>
+          </div>
+
+          <div class="hero-floating-badge badge-top-right">
+            <span class="hero-badge-icon">🛡️</span>
+            <div>
+              <div>Red-Flag Guard</div>
+              <small style="color: var(--leaf-green); font-size: 0.72rem;">Active & Monitored</small>
+            </div>
+          </div>
+
+          <div class="hero-floating-badge badge-bottom-left">
+            <span class="hero-badge-icon">📴</span>
+            <div>
+              <div>Local LLM Ready</div>
+              <small style="color: var(--cyan-blue); font-size: 0.72rem;">100% Offline</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INTERACTIVE ASSISTANT APP SECTION -->
+  <section id="appSection" class="app-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Interactive Assistant</span>
+      <h3 class="section-title">Your Maternal Care Companion</h3>
+      <p class="section-desc">Select your current pregnancy week and language to start a personalized conversation.</p>
+    </div>
+
+    <div class="app-wrapper reveal">
+      
+      <!-- PROFILE SETUP SCREEN -->
+      <div id="setupScreen" class="card">
+        <div class="setup-hero">
+          <video src="assets/logo.mp4" autoplay loop muted playsinline class="setup-hero-logo"></video>
+          <h2>Let's personalize Janani</h2>
+          <p class="card-intro">Private, localized pregnancy care tailored to your exact week</p>
+        </div>
+
+        <div class="form-group">
+          <label for="weekInput">Pregnancy Week (1–40)</label>
+          <input type="number" id="weekInput" min="1" max="40" placeholder="e.g. 18" />
+          <div class="error-text" id="weekError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="languageSelect">Preferred Language</label>
+          <select id="languageSelect">
+            <option value="English">English</option>
+            <option value="Telugu">తెలుగు (Telugu)</option>
+            <option value="Hindi">हिन्दी (Hindi)</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" id="startBtn">Start Chatting</button>
+
+        <div class="privacy-note">
+          <strong>🔒 Offline & Secure:</strong> Your pregnancy information and chat history remain safely on this device. Janani never sends your personal data to any external cloud servers.
+        </div>
+      </div>
+
+      <!-- CHAT SCREEN -->
+      <div id="chatScreen" class="card">
+        <div class="chat-meta">
+          <div class="meta-pills">
+            <span class="pill" id="weekTrimesterPill">Week — • —</span>
+            <span class="pill pill-lang" id="languagePill">Language: —</span>
+            <button class="chat-sos-btn" onclick="triggerEmergencyMode('Manual SOS Trigger')">
+              <span>🚨 SOS</span>
+            </button>
+          </div>
+          <div class="chat-actions">
+            <button class="btn-secondary" id="clearChatBtn">Clear Chat</button>
+            <button class="btn-secondary" id="resetProfileBtn">Reset Profile</button>
+          </div>
+        </div>
+
+        <div id="chatWindow" aria-live="polite"></div>
+
+        <div class="quick-qs" id="quickQuestions"></div>
+
+        <div class="input-row">
+          <input type="text" id="messageInput" placeholder="Type your pregnancy question..." aria-label="Type your question" />
+          <button id="sendBtn">Send</button>
+        </div>
+
+        <div class="privacy-note">
+          <strong>⚠️ Medical Safety Guard:</strong> If you report severe symptoms (e.g. bleeding, severe pain, vision changes), Janani immediately switches to Emergency Mode to assist with emergency contacts.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section id="featuresSection" class="features-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Core Capabilities</span>
+      <h3 class="section-title">Designed with Care for Every Stage</h3>
+      <p class="section-desc">Combining medical safety, linguistic diversity, and offline intelligence.</p>
+    </div>
+
+    <div class="features-grid">
+      
+      <div class="feature-card reveal">
+        <div class="feature-icon-box">🚨</div>
+        <h3>Active Emergency Escalation</h3>
+        <p>Real-time detection for life-threatening symptoms (hemorrhage, severe abdominal pain, seizures, fluid leakage) with instant ambulance dispatch calling.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon-box">🌿</div>
+        <h3>Trimester-Aware RAG</h3>
+        <p>Dynamically loads curated maternal knowledge tailored to your exact week (1 to 40), offering relevant fetal development and symptom insights.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon-box">🔒</div>
+        <h3>100% Offline & Private</h3>
+        <p>Runs entirely through local LLM inference on your device. No cloud transmission, no login tracking, and absolute data sovereignty.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon-box">🗣️</div>
+        <h3>Multilingual Empathy</h3>
+        <p>Speaks natively in English, Telugu (తెలుగు), and Hindi (हिन्दी) so that quality pregnancy knowledge is accessible without language barriers.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon-box">📍</div>
+        <h3>Nearest Maternity Locator</h3>
+        <p>Instant GPS location detection to find nearby maternity hospitals, health centers, and ambulance contacts with 1-click calling.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon-box">⚡</div>
+        <h3>Instant Local Response</h3>
+        <p>Zero dependency on internet connections. Quick, dependable maternal support whenever expectant mothers need it most.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TRIMESTER JOURNEY SECTION -->
+  <section id="trimesterSection" class="trimester-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Pregnancy Journey</span>
+      <h3 class="section-title">Understanding Your Trimesters</h3>
+      <p class="section-desc">Explore key milestones and maternal health focus points across the 40 weeks.</p>
+    </div>
+
+    <div class="timeline-container reveal">
+      <div class="trimester-tabs">
+        <button class="tri-tab-btn active" onclick="switchTrimester(1)">First Trimester (W1–13)</button>
+        <button class="tri-tab-btn" onclick="switchTrimester(2)">Second Trimester (W14–26)</button>
+        <button class="tri-tab-btn" onclick="switchTrimester(3)">Third Trimester (W27–40)</button>
+      </div>
+
+      <!-- TRIMESTER 1 -->
+      <div id="triContent1" class="tri-tab-content active">
+        <div class="tri-info">
+          <h4>First Trimester: The Foundation</h4>
+          <p>The first 13 weeks are crucial for embryonic growth, organ development, and adjusting to major hormonal shifts.</p>
+          <ul class="tri-points">
+            <li><span>✓</span> Fetal heartbeat develops around weeks 5–6</li>
+            <li><span>✓</span> Essential daily folic acid intake & hydration</li>
+            <li><span>✓</span> Managing nausea, morning sickness & fatigue</li>
+          </ul>
+        </div>
+        <div class="tri-card-box">
+          <h5>💡 Janani Tip</h5>
+          <p style="color: var(--charcoal-muted); font-size: 0.92rem;">"Small, frequent meals and gentle rest can significantly soothe morning sickness. Avoid self-medication during early organ development."</p>
+        </div>
+      </div>
+
+      <!-- TRIMESTER 2 -->
+      <div id="triContent2" class="tri-tab-content">
+        <div class="tri-info">
+          <h4>Second Trimester: The Golden Period</h4>
+          <p>Weeks 14 to 26 often bring renewed energy as the baby grows rapidly, developing hearing, fingernails, and active kicks.</p>
+          <ul class="tri-points">
+            <li><span>✓</span> Feeling first baby kicks (quickening)</li>
+            <li><span>✓</span> Anomaly ultrasound scans around week 18–20</li>
+            <li><span>✓</span> Calcium, iron & nutrient-rich diet support</li>
+          </ul>
+        </div>
+        <div class="tri-card-box">
+          <h5>💡 Janani Tip</h5>
+          <p style="color: var(--charcoal-muted); font-size: 0.92rem;">"Sleeping on your side (especially left) improves blood flow to your baby and eases back strain."</p>
+        </div>
+      </div>
+
+      <!-- TRIMESTER 3 -->
+      <div id="triContent3" class="tri-tab-content">
+        <div class="tri-info">
+          <h4>Third Trimester: Preparation & Bloom</h4>
+          <p>From week 27 to delivery, your baby gains weight and lung maturity while you prepare for birth.</p>
+          <ul class="tri-points">
+            <li><span>✓</span> Tracking daily fetal movement & kick counts</li>
+            <li><span>✓</span> Recognizing genuine labor vs. Braxton Hicks</li>
+            <li><span>✓</span> Hospital bag & birth plan preparations</li>
+          </ul>
+        </div>
+        <div class="tri-card-box">
+          <h5>💡 Janani Tip</h5>
+          <p style="color: var(--charcoal-muted); font-size: 0.92rem;">"Practice rhythmic breathing and gentle pelvic stretches. Contact your hospital immediately if you experience reduced baby movements."</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section id="faqSection" class="faq-section">
+    <div class="section-header reveal">
+      <span class="section-tag">Frequently Asked Questions</span>
+      <h3 class="section-title">Everything You Need to Know</h3>
+      <p class="section-desc">Clear answers about emergency escalations, privacy, and offline capabilities.</p>
+    </div>
+
+    <div class="faq-container">
+      
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How does Janani's Emergency Mode work?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          When life-threatening pregnancy symptoms (e.g. severe bleeding, intense abdominal pain, breathing difficulty, fluid leakage) are detected, Janani instantly switches to Emergency Mode, detects nearby medical facilities via GPS, and provides 1-tap calling for ambulances (108/102) and hospitals.
+        </div>
+      </div>
+
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Does Janani diagnose medical conditions?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          No. Janani is an educational assistant and emergency triage connector. It never provides clinical diagnoses or prescribes medicines. All urgent symptoms are immediately escalated to registered emergency professionals.
+        </div>
+      </div>
+
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Is my pregnancy data private and secure?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          Yes, 100%. Your pregnancy week, chosen language, and chat history are kept exclusively in your local browser storage. No medical data is sent to external servers.
+        </div>
+      </div>
+
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What emergency numbers are configured?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          In India, Janani connects directly to National Emergency Ambulance (108), Maternal & Child Healthcare Line (102), and National Emergency Support (112).
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      
+      <div class="footer-brand">
+        <div class="footer-brand-header">
+          <div class="footer-logo-frame">
+            <video src="assets/logo.mp4" autoplay loop muted playsinline class="footer-logo"></video>
+          </div>
+          <h3>Janani.</h3>
+        </div>
+        <p>A compassionate, offline-first AI assistant empowering mothers with private, accessible, and clinically safeguarded pregnancy care.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#appSection">AI Assistant</a></li>
+          <li><a href="#featuresSection">Core Features</a></li>
+          <li><a href="#trimesterSection">Trimester Guide</a></li>
+          <li><a href="#faqSection">Safety & FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Emergency Numbers (India)</h4>
+        <ul>
+          <li><a href="tel:108">🚑 National Ambulance: 108</a></li>
+          <li><a href="tel:102">👶 Maternal & Child Care: 102</a></li>
+          <li><a href="tel:112">🚨 National Emergency: 112</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      Janani • Built with 🌿 Care for Motherhood • <span>100% Offline Local AI & Emergency Guard</span>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       EMERGENCY ASSISTANCE FULL-SCREEN MODAL
+  ========================================================= -->
+  <div id="emergencyOverlay" role="dialog" aria-modal="true" aria-labelledby="emergencyTitle">
+    <div class="emergency-card">
+      
+      <div class="emergency-header">
+        <div class="emergency-siren-badge">
+          <span>🚨</span>
+          <span>EMERGENCY ASSISTANCE MODE</span>
+        </div>
+        <h3 class="emergency-title" id="emergencyTitle">
+          Possible Pregnancy Emergency
+        </h3>
+        <p class="emergency-subtitle" id="emergencySubtitle">
+          This may be a pregnancy emergency. Please seek medical help immediately.
+        </p>
+        <div class="emergency-symptom-tag" id="emergencySymptomTag">
+          Detected: Warning Symptoms Reported
+        </div>
+      </div>
+
+      <!-- UNRESPONSIVE TIMEOUT BANNER -->
+      <div class="unresponsive-alert-box" id="unresponsiveAlertBox" style="display: none;">
+        <span>⚠️</span>
+        <div>
+          <strong>If you cannot speak or dial:</strong> Please shout for family/neighbors or ask someone nearby to dial <strong>108</strong> immediately!
+        </div>
+      </div>
+
+      <!-- LOCATION & NEAREST FACILITY CARD -->
+      <div class="emergency-location-box">
+        <div class="location-header">
+          <span id="gpsStatusText">📍 Detecting your location...</span>
+          <span style="font-size: 0.76rem; color: var(--leaf-green);" id="gpsAccuracyText">GPS Active</span>
+        </div>
+        <div class="location-details" id="gpsCoordinatesText">
+          Requesting device location coordinates for nearest hospital dispatch...
+        </div>
+
+        <div class="nearest-facility-item" id="nearestFacilityBox">
+          <div class="facility-info">
+            <h5 id="nearestHospitalName">🏥 District Maternity & Child Hospital</h5>
+            <p id="nearestHospitalDistance">Approx 2.4 km away • 24/7 Emergency Delivery Wing</p>
+          </div>
+          <a href="tel:108" class="btn-secondary" style="border-color: var(--emergency-red); color: var(--emergency-red);" onclick="confirmEmergencyCall('108', 'Hospital Emergency Wing')">Call</a>
+        </div>
+      </div>
+
+      <!-- TWO PROMINENT EMERGENCY OPTIONS -->
+      <div class="emergency-actions-grid">
+        <button class="btn-emergency-call btn-call-ambulance" onclick="confirmEmergencyCall('108', 'Ambulance Service (108)')">
+          <span>🚑 Call Ambulance</span>
+          <span class="btn-emergency-sub">Dial 108 / 102 (Free)</span>
+        </button>
+
+        <button class="btn-emergency-call btn-call-hospital" onclick="confirmEmergencyCall('108', 'Nearest Maternity Hospital')">
+          <span>🏥 Call Nearest Hospital</span>
+          <span class="btn-emergency-sub">Emergency Maternity Wing</span>
+        </button>
+      </div>
+
+      <!-- SECONDARY ACTIONS: MAP & SOS SMS -->
+      <div class="emergency-secondary-actions">
+        <a href="https://www.google.com/maps/search/maternity+hospital+emergency+near+me/" target="_blank" rel="noopener" class="btn-emergency-secondary" id="mapDirectionsBtn">
+          <span>📍</span>
+          <span>Show Nearest Maternity Hospitals on Google Maps</span>
+        </a>
+
+        <button class="btn-emergency-secondary" onclick="shareEmergencyLocation()">
+          <span>📢</span>
+          <span>Share My GPS Location via WhatsApp / SMS</span>
+        </button>
+      </div>
+
+      <!-- IMMEDIATE GUIDELINES -->
+      <div class="emergency-guidance">
+        <h6 id="guidanceTitle">🌿 Immediate First-Aid Steps (While Waiting):</h6>
+        <ul id="guidanceList">
+          <li>Lie down on your <strong>left side</strong> to optimize fetal blood flow.</li>
+          <li>Do <strong>not</strong> consume unprescribed pills or herbal drinks.</li>
+          <li>Keep your Mother & Child Protection Card / pregnancy records ready.</li>
+          <li>Have a family member or neighbor accompany you immediately.</li>
+        </ul>
+      </div>
+
+      <div class="emergency-footer">
+        <p class="emergency-disclaimer">
+          Janani provides emergency escalation and does not provide clinical diagnosis. All critical symptoms require in-person evaluation.
+        </p>
+        <button class="btn-dismiss-emergency" onclick="closeEmergencyMode()">
+          Dismiss / Return
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CALL CONFIRMATION DIALOG -->
+  <div id="callConfirmDialog">
+    <div class="confirm-card">
+      <h4>📞 Emergency Call Confirmation</h4>
+      <p id="confirmCallText">Do you want to place a call to Emergency Services (108) now?</p>
+      <div class="confirm-btns">
+        <button class="btn-confirm-yes" id="confirmCallYesBtn">Call Now</button>
+        <button class="btn-confirm-no" onclick="closeCallConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    (function () {
+      "use strict";
+
+      const API_URL = "http://localhost:8000/chat";
+
+      const STORAGE_KEYS = {
+        week: "janani_week",
+        language: "janani_language",
+        history: "janani_chat_history",
+      };
+
+      // Client-side emergency keywords for zero-latency escalation
+      const EMERGENCY_KEYWORDS = [
+        "bleeding", "heavy bleeding", "blood", "spotting with pain", "blood clot", "hemorrhage",
+        "రక్తం", "రక్తస్రావం", "raktham", "rakthasravam", "khoon", "खून", "रक्तस्राव",
+        "severe pain", "sharp pain", "severe cramp", "stomach pain", "abdominal pain", "pelvic pain",
+        "unbearable pain", "నొప్పి", "తీవ్రమైన నొప్పి", "noppi", "dard", "दर्द", "पेट दर्द", "तेజ दर्द",
+        "difficulty breathing", "shortness of breath", "chest pain", "breathless", "cannot breathe",
+        "ఊపిరి", "ఊపిరి ఆడకపోవడం", "saans", "साँस", "सीने में दर्द",
+        "seizure", "convulsion", "fit", "fainted", "fainting", "passed out", "unconscious", "loss of consciousness", "collapsed",
+        "స్పృహ", "స్పృహ తప్పడం", "spruha", "behoshi", "behos", "बेहोश", "दौरा", "fits",
+        "vision change", "blurred vision", "flashing light", "severe headache", "extreme headache", "high bp", "swollen face",
+        "కళ్ళు తిరగడం", "తలనొప్పి", "dhundhla", "धुंधला", "सिरदर्द",
+        "leaking fluid", "water broke", "water break", "amniotic fluid", "water leakage", "leaking water",
+        "ఉమ్మనీరు", "ummaneeru", "pani", "पानी छूटना",
+        "baby not moving", "no movement", "less movement", "reduced movement", "no kicks", "stopped moving",
+        "కదలికలు లేవు", "kadalikalu", "bacha hil", "बच्चा हिल नहीं रहा", "हलचल बंद",
+        "miscarriage", "emergency", "urgent hospital", "danger", "ఆపద", "అత్యవసరం", "आपातकाल", "खतरा"
+      ];
+
+      // Multilingual emergency strings
+      const EMERGENCY_STRINGS = {
+        English: {
+          title: "Possible Pregnancy Emergency",
+          subtitle: "This may be a pregnancy emergency. Please seek medical help immediately.",
+          unresponsive: "If you cannot speak or dial: Please shout for family/neighbors or ask someone nearby to dial 108 immediately!",
+          guidanceTitle: "🌿 Immediate First-Aid Steps (While Waiting):",
+          guidance: [
+            "Lie down on your left side to optimize fetal blood flow.",
+            "Do not consume unprescribed pills or herbal drinks.",
+            "Keep your Mother & Child Protection Card / medical records ready.",
+            "Have a family member or neighbor accompany you immediately."
+          ]
+        },
+        Telugu: {
+          title: "గర్భధారణ అత్యవసర పరిస్థితి",
+          subtitle: "ఇది గర్భధారణ అత్యవసర పరిస్థితి కావచ్చు. దయచేసి వెంటనే వైద్య సహాయం పొందండి.",
+          unresponsive: "మీరు మాట్లాడలేకపోతే లేదా డయల్ చేయలేకపోతే: దయచేసి కుటుంబ సభ్యులను లేదా పక్కింటి వారిని పిలవండి లేదా వెంటనే 108 కు కాల్ చేయమనండి!",
+          guidanceTitle: "🌿 తక్షణ జాగ్రత్తలు (సహాయం అందే వరకు):",
+          guidance: [
+            "ఎడమ వైపుకు తిరిగి పడుకోండి, ఇది రక్తప్రసరణకు మంచిది.",
+            "డాక్టర్ సలహా లేకుండా ఎటువంటి మందులు వేసుకోవద్దు.",
+            "మీ గర్భధారణ రిపోర్టులు మరియు కార్డును అందుబాటులో ఉంచుకోండి.",
+            "వెంటనే తోడుగా ఒకరిని ఆసుపత్రికి తీసుకెళ్లండి."
+          ]
+        },
+        Hindi: {
+          title: "गर्भावस्था आपातकालीन स्थिति",
+          subtitle: "यह गर्भावस्था की गंभीर स्थिति हो सकती है। कृपया तुरंत चिकित्सकीय सहायता लें।",
+          unresponsive: "यदि आप बोलने या डायल करने में असमर्थ हैं: कृपया तुरंत परिवार या पड़ोसियों को पुकारें या किसी से 108 पर कॉल करने को कहें!",
+          guidanceTitle: "🌿 तत्काल प्राथमिक देखभाल (मदद आने तक):",
+          guidance: [
+            "बाईं करवट लेटें, इससे शिशु तक रक्त प्रवाह बेहतर रहता है।",
+            "बिना डॉक्टर की सलाह के कोई दवा न लें।",
+            "अपनी गर्भावस्था की रिपोर्ट और एमसीपी कार्ड पास रखें।",
+            "तुरंत किसी परिजन के साथ नजदीकी अस्पताल पहुँचें।"
+          ]
+        }
+      };
+
+      // ---------- Elements ----------
+      const setupScreen = document.getElementById("setupScreen");
+      const chatScreen = document.getElementById("chatScreen");
+      const weekInput = document.getElementById("weekInput");
+      const weekError = document.getElementById("weekError");
+      const languageSelect = document.getElementById("languageSelect");
+      const startBtn = document.getElementById("startBtn");
+
+      const weekTrimesterPill = document.getElementById("weekTrimesterPill");
+      const languagePill = document.getElementById("languagePill");
+      const chatWindow = document.getElementById("chatWindow");
+      const quickQuestionsEl = document.getElementById("quickQuestions");
+      const messageInput = document.getElementById("messageInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const clearChatBtn = document.getElementById("clearChatBtn");
+      const resetProfileBtn = document.getElementById("resetProfileBtn");
+
+      // Emergency Elements
+      const emergencyOverlay = document.getElementById("emergencyOverlay");
+      const emergencyTitle = document.getElementById("emergencyTitle");
+      const emergencySubtitle = document.getElementById("emergencySubtitle");
+      const emergencySymptomTag = document.getElementById("emergencySymptomTag");
+      const unresponsiveAlertBox = document.getElementById("unresponsiveAlertBox");
+      const gpsStatusText = document.getElementById("gpsStatusText");
+      const gpsCoordinatesText = document.getElementById("gpsCoordinatesText");
+      const mapDirectionsBtn = document.getElementById("mapDirectionsBtn");
+      const guidanceTitle = document.getElementById("guidanceTitle");
+      const guidanceList = document.getElementById("guidanceList");
+      const callConfirmDialog = document.getElementById("callConfirmDialog");
+      const confirmCallText = document.getElementById("confirmCallText");
+      const confirmCallYesBtn = document.getElementById("confirmCallYesBtn");
+
+      let currentCoords = null;
+      let unresponsiveTimer = null;
+
+      const QUICK_QUESTIONS = {
+        English: [
+          "What changes happen during this trimester?",
+          "What foods are good during pregnancy?",
+          "What symptoms are common?",
+        ],
+        Telugu: [
+          "ఈ సమయంలో సాధారణంగా ఏ మార్పులు జరుగుతాయి?",
+          "గర్భధారణలో ఏ ఆహారాలు మంచివి?",
+          "సాధారణ లక్షణాలు ఏమిటి?",
+        ],
+        Hindi: [
+          "इस तिमाही में कौन से बदलाव सामान्य हैं?",
+          "गर्भावस्था में कौन से खाद्य पदार्थ अच्छे हैं?",
+          "सामान्य लक्षण क्या हैं?",
+        ],
+      };
+
+      // ---------- Helpers ----------
+      function trimesterFromWeek(week) {
+        if (week <= 13) return { num: 1, label: "First Trimester" };
+        if (week <= 26) return { num: 2, label: "Second Trimester" };
+        return { num: 3, label: "Third Trimester" };
+      }
+
+      function safeGet(key) {
+        try { return window.localStorage.getItem(key); }
+        catch (e) { return null; }
+      }
+      function safeSet(key, val) {
+        try { window.localStorage.setItem(key, val); }
+        catch (e) { /* storage unavailable, fail silently */ }
+      }
+      function safeRemove(key) {
+        try { window.localStorage.removeItem(key); }
+        catch (e) { /* ignore */ }
+      }
+
+      function loadHistory() {
+        const raw = safeGet(STORAGE_KEYS.history);
+        if (!raw) return [];
+        try {
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveHistory(history) {
+        safeSet(STORAGE_KEYS.history, JSON.stringify(history));
+      }
+
+      function appendMessage(role, text, opts) {
+        opts = opts || {};
+        const div = document.createElement("div");
+        div.className = "msg " + role + (opts.alert ? " alert" : "");
+        div.textContent = text;
+
+        // If it's a safety emergency alert, inject direct action buttons into chat
+        if (opts.alert) {
+          const btnBox = document.createElement("div");
+          btnBox.className = "in-chat-emergency-box";
+          
+          const sosBtn = document.createElement("button");
+          sosBtn.className = "in-chat-emergency-btn";
+          sosBtn.innerHTML = "<span>🚨 Open Emergency Assistance (Ambulance & Hospitals)</span>";
+          sosBtn.onclick = function () {
+            triggerEmergencyMode("Reported Emergency Symptoms");
+          };
+          btnBox.appendChild(sosBtn);
+          div.appendChild(btnBox);
+        }
+
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return div;
+      }
+
+      function showTyping() {
+        const div = document.createElement("div");
+        div.className = "typing";
+        div.id = "typingIndicator";
+        div.innerHTML = "<span></span><span></span><span></span>";
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+      function hideTyping() {
+        const el = document.getElementById("typingIndicator");
+        if (el) el.remove();
+      }
+
+      function renderQuickQuestions(language) {
+        quickQuestionsEl.innerHTML = "";
+        const list = QUICK_QUESTIONS[language] || QUICK_QUESTIONS.English;
+        list.forEach(function (q) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = q;
+          btn.addEventListener("click", function () { sendMessage(q); });
+          quickQuestionsEl.appendChild(btn);
+        });
+      }
+
+      function renderStoredHistory() {
+        chatWindow.innerHTML = "";
+        const history = loadHistory();
+        if (history.length === 0) {
+          appendMessage("system", "Chat history is empty. Ask a pregnancy question to begin.");
+          return;
+        }
+        history.forEach(function (entry) {
+          appendMessage(entry.role, entry.text, { alert: !!entry.alert });
+        });
+      }
+
+      // Check text for client-side emergency keywords
+      function containsEmergencySymptoms(text) {
+        const lower = text.toLowerCase();
+        for (let i = 0; i < EMERGENCY_KEYWORDS.length; i++) {
+          if (lower.includes(EMERGENCY_KEYWORDS[i].toLowerCase())) {
+            return EMERGENCY_KEYWORDS[i];
+          }
+        }
+        return null;
+      }
+
+      // =========================================================
+      // EMERGENCY MODE TRIGGER & CONTROLS
+      // =========================================================
+      window.triggerEmergencyMode = function (detectedSymptom) {
+        const profile = getActiveProfile();
+        const lang = profile.language || "English";
+        const strings = EMERGENCY_STRINGS[lang] || EMERGENCY_STRINGS.English;
+
+        emergencyTitle.textContent = strings.title;
+        emergencySubtitle.textContent = strings.subtitle;
+        emergencySymptomTag.textContent = "Reported Indicator: " + (detectedSymptom || "Severe Pregnancy Symptom");
+        
+        guidanceTitle.textContent = strings.guidanceTitle;
+        guidanceList.innerHTML = "";
+        strings.guidance.forEach(function (item) {
+          const li = document.createElement("li");
+          li.textContent = item;
+          guidanceList.appendChild(li);
+        });
+
+        emergencyOverlay.style.display = "flex";
+        unresponsiveAlertBox.style.display = "none";
+
+        // Start non-response timer (15 seconds)
+        if (unresponsiveTimer) clearTimeout(unresponsiveTimer);
+        unresponsiveTimer = setTimeout(function () {
+          unresponsiveAlertBox.style.display = "flex";
+        }, 15000);
+
+        // Fetch Location with user permission
+        fetchLocationForEmergency();
+      };
+
+      window.closeEmergencyMode = function () {
+        emergencyOverlay.style.display = "none";
+        if (unresponsiveTimer) clearTimeout(unresponsiveTimer);
+      };
+
+      function fetchLocationForEmergency() {
+        gpsStatusText.textContent = "📍 Locating nearest emergency maternity center...";
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            function (pos) {
+              currentCoords = {
+                lat: pos.coords.latitude.toFixed(4),
+                lon: pos.coords.longitude.toFixed(4),
+              };
+              gpsStatusText.textContent = "📍 Location Verified (GPS Active)";
+              gpsCoordinatesText.textContent = `Coordinates: ${currentCoords.lat}° N, ${currentCoords.lon}° E • Search radius: 5km`;
+              mapDirectionsBtn.href = `https://www.google.com/maps/search/maternity+hospital+emergency/@${currentCoords.lat},${currentCoords.lon},14z`;
+            },
+            function (err) {
+              gpsStatusText.textContent = "📍 Location: Area Triage Active";
+              gpsCoordinatesText.textContent = "Using district primary maternity dispatch network.";
+              mapDirectionsBtn.href = "https://www.google.com/maps/search/maternity+hospital+emergency+near+me/";
+            },
+            { timeout: 8000 }
+          );
+        } else {
+          gpsStatusText.textContent = "📍 Location: Area Triage Active";
+          gpsCoordinatesText.textContent = "Connecting to national maternity ambulance routing (108).";
+        }
+      }
+
+      window.confirmEmergencyCall = function (number, title) {
+        confirmCallText.textContent = `Do you want to place an emergency call to ${title} (${number}) now?`;
+        callConfirmDialog.style.display = "flex";
+        
+        confirmCallYesBtn.onclick = function () {
+          callConfirmDialog.style.display = "none";
+          window.location.href = "tel:" + number;
+        };
+      };
+
+      window.closeCallConfirm = function () {
+        callConfirmDialog.style.display = "none";
+      };
+
+      window.shareEmergencyLocation = function () {
+        const coordsStr = currentCoords ? `${currentCoords.lat}, ${currentCoords.lon}` : "My current location";
+        const mapUrl = currentCoords ? `https://maps.google.com/?q=${currentCoords.lat},${currentCoords.lon}` : "https://maps.google.com";
+        const text = encodeURIComponent(`🚨 PREGNANCY MEDICAL EMERGENCY: I am an expectant mother experiencing urgent symptoms and need immediate hospital assistance. Location: ${coordsStr} (${mapUrl})`);
+        
+        window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
+      };
+
+      // ---------- Setup screen ----------
+      function validateWeek(rawValue) {
+        const week = parseInt(rawValue, 10);
+        if (isNaN(week)) return { valid: false, message: "Please enter a valid number." };
+        if (week < 1 || week > 40) return { valid: false, message: "Week must be between 1 and 40." };
+        return { valid: true, week: week };
+      }
+
+      startBtn.addEventListener("click", function () {
+        const result = validateWeek(weekInput.value);
+        if (!result.valid) {
+          weekError.textContent = result.message;
+          return;
+        }
+        weekError.textContent = "";
+
+        const language = languageSelect.value;
+        safeSet(STORAGE_KEYS.week, String(result.week));
+        safeSet(STORAGE_KEYS.language, language);
+
+        openChatScreen(result.week, language);
+      });
+
+      weekInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") startBtn.click();
+      });
+
+      // ---------- Chat screen ----------
+      function openChatScreen(week, language) {
+        const tri = trimesterFromWeek(week);
+        weekTrimesterPill.textContent = "Week " + week + " • " + tri.label;
+        languagePill.textContent = "Language: " + language;
+
+        renderQuickQuestions(language);
+        renderStoredHistory();
+
+        setupScreen.style.display = "none";
+        chatScreen.style.display = "flex";
+        messageInput.focus();
+      }
+
+      function getActiveProfile() {
+        const week = parseInt(safeGet(STORAGE_KEYS.week), 10);
+        const language = safeGet(STORAGE_KEYS.language) || "English";
+        return { week: week, language: language };
+      }
+
+      async function sendMessage(overrideText) {
+        const text = (overrideText !== undefined ? overrideText : messageInput.value).trim();
+        if (!text) return;
+
+        const profile = getActiveProfile();
+        if (!profile.week || isNaN(profile.week)) {
+          appendMessage("system", "Profile missing. Please reset and set up again.");
+          return;
+        }
+
+        // 1. Show user's message immediately
+        appendMessage("user", text);
+        const history = loadHistory();
+        history.push({ role: "user", text: text });
+        saveHistory(history);
+
+        messageInput.value = "";
+        sendBtn.disabled = true;
+
+        // 2. Client-Side Instant Emergency Check
+        const detectedEmergency = containsEmergencySymptoms(text);
+        if (detectedEmergency) {
+          // Immediately pop up emergency mode without waiting for network
+          setTimeout(function () {
+            triggerEmergencyMode(detectedEmergency);
+          }, 350);
+        }
+
+        // 3. Loading indicator
+        showTyping();
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(function () { controller.abort(); }, 90000);
+
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: text,
+              week: profile.week,
+              language: profile.language,
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+          hideTyping();
+
+          if (!response.ok) {
+            let detail = "Something went wrong. Please try again.";
+            try {
+              const errBody = await response.json();
+              if (errBody && errBody.detail) detail = errBody.detail;
+            } catch (e) { /* ignore parse failure */ }
+            appendMessage("bot", detail, { alert: true });
+            const h = loadHistory();
+            h.push({ role: "bot", text: detail, alert: true });
+            saveHistory(h);
+            return;
+          }
+
+          const data = await response.json();
+          if (!data || typeof data.reply !== "string") {
+            throw new Error("Invalid response shape");
+          }
+
+          const isAlert = !!data.safety_alert || !!data.emergency_mode;
+          appendMessage("bot", data.reply, { alert: isAlert });
+          const h2 = loadHistory();
+          h2.push({ role: "bot", text: data.reply, alert: isAlert });
+          saveHistory(h2);
+
+          // If backend reports emergency escalation, trigger modal
+          if (data.emergency_mode) {
+            triggerEmergencyMode(data.symptom || "Critical Symptoms Reported");
+          }
+
+        } catch (err) {
+          hideTyping();
+          let friendly = "Local AI is not running. Please make sure Ollama and the Janani backend are running.";
+          if (err && err.name === "AbortError") {
+            friendly = "The local AI took too long to respond. Please try again.";
+          }
+          appendMessage("bot", friendly, { alert: true });
+          const h3 = loadHistory();
+          h3.push({ role: "bot", text: friendly, alert: true });
+          saveHistory(h3);
+        } finally {
+          sendBtn.disabled = false;
+          messageInput.focus();
+        }
+      }
+
+      sendBtn.addEventListener("click", function () { sendMessage(); });
+      messageInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") sendMessage();
+      });
+
+      // ---------- Clear chat ----------
+      clearChatBtn.addEventListener("click", function () {
+        safeRemove(STORAGE_KEYS.history);
+        chatWindow.innerHTML = "";
+        appendMessage("system", "Chat history cleared.");
+      });
+
+      // ---------- Reset profile ----------
+      resetProfileBtn.addEventListener("click", function () {
+        const confirmed = window.confirm(
+          "This will clear your pregnancy week, language, and chat history. Continue?"
+        );
+        if (!confirmed) return;
+
+        safeRemove(STORAGE_KEYS.week);
+        safeRemove(STORAGE_KEYS.language);
+        safeRemove(STORAGE_KEYS.history);
+
+        chatScreen.style.display = "none";
+        setupScreen.style.display = "block";
+        weekInput.value = "";
+        weekError.textContent = "";
+        languageSelect.value = "English";
+      });
+
+      // ---------- Init: restore existing profile if present ----------
+      (function init() {
+        const storedWeek = safeGet(STORAGE_KEYS.week);
+        const storedLanguage = safeGet(STORAGE_KEYS.language);
+        if (storedWeek && storedLanguage) {
+          const week = parseInt(storedWeek, 10);
+          if (!isNaN(week) && week >= 1 && week <= 40) {
+            openChatScreen(week, storedLanguage);
+            return;
+          }
+        }
+        setupScreen.style.display = "block";
+        chatScreen.style.display = "none";
+      })();
+
+    })();
+
+    // ---------- Trimester tab switcher ----------
+    window.switchTrimester = function (triNum) {
+      document.querySelectorAll('.tri-tab-btn').forEach(function (btn, idx) {
+        btn.classList.toggle('active', idx === (triNum - 1));
+      });
+      document.querySelectorAll('.tri-tab-content').forEach(function (content, idx) {
+        content.classList.toggle('active', idx === (triNum - 1));
+      });
+    };
+
+    // ---------- FAQ accordion toggler ----------
+    window.toggleFaq = function (button) {
+      const item = button.parentElement;
+      const isActive = item.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(function (el) {
+        el.classList.remove('active');
+      });
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    };
+
+    // ---------- Scroll Reveal Observer ----------
+    document.addEventListener("DOMContentLoaded", function () {
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      }, { threshold: 0.15 });
+
+      reveals.forEach(function (el) {
+        observer.observe(el);
+      });
+    });
+
+    // ---------- Canvas Floating Stardust Particles (Inspired by BG.mp4) ----------
+    (function initParticles() {
+      const canvas = document.getElementById('particleCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', function () {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const particles = [];
+      const count = 35;
+      const colors = ['#78B943', '#159DDA', '#FFD0B5', '#F58F91'];
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2.2 + 0.8,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -Math.random() * 0.5 - 0.2,
+          alpha: Math.random() * 0.7 + 0.3,
+          deltaAlpha: (Math.random() - 0.5) * 0.015,
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach(function (p) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha += p.deltaAlpha;
+
+          if (p.alpha <= 0.1 || p.alpha >= 0.9) {
+            p.deltaAlpha = -p.deltaAlpha;
+          }
+
+          if (p.y < 0) {
+            p.y = height + 10;
+            p.x = Math.random() * width;
+          }
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
+          ctx.fill();
+        });
+
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+  </script>
+
+</body>
+
+</html>
